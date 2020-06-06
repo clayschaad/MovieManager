@@ -25,7 +25,7 @@ namespace MovieCleaner.VideoInfo
             {
                 foreach (var stream in mediaInfo.Streams.Where(m => m.CodecType == "audio"))
                 {
-                    var language = stream.Tags.Single(t => t.Key == "language");
+                    var language = stream.Tags.SingleOrDefault(t => t.Key == "language");
                     if (language.Key != null)
                     {
                         languages.Add(language.Value);
@@ -43,7 +43,7 @@ namespace MovieCleaner.VideoInfo
             {
                 foreach (var stream in mediaInfo.Streams.Where(m => m.CodecType == "subtitle"))
                 {
-                    var language = stream.Tags.Single(t => t.Key == "language");
+                    var language = stream.Tags.SingleOrDefault(t => t.Key == "language");
                     if (language.Key != null)
                     {
                         languages.Add(language.Value);

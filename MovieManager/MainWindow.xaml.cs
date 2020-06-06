@@ -46,11 +46,6 @@ namespace MovieCleaner
 
         private void AppendFiles(string sourceDirectory, List<MovieFile> movieFiles)
         {
-            if (movieFiles.Count >= 5)
-            {
-                return;
-            }
-
             var files = Directory.GetFiles(sourceDirectory);
             foreach (var file in files)
             {
@@ -79,7 +74,7 @@ namespace MovieCleaner
             var movieSearchResult = (MovieSearchResult)((System.Windows.Controls.Primitives.Selector)e.Source).SelectedItem;
             if (movieSearchResult != null)
             {
-                if (movieSearchResult.OriginalLanguage == "en" && movieFiles[currentFile].AudioLanguages.Contains("eng"))
+                if (movieSearchResult.OriginalLanguage == "en" && (movieFiles[currentFile].AudioLanguages.Contains("eng") || movieFiles[currentFile].AudioLanguages.Count == 0))
                 {
                     tbTitle.Text = movieSearchResult.OriginalTitle;
                 }
@@ -145,18 +140,36 @@ namespace MovieCleaner
                 {
                     var name = GetValidName(movie.Title);
                     var destinationFile = tbDestinationPath.Text + "\\" + name + Path.GetExtension(movie.Filename);
+
+                    if (!File.Exists(movie.FullPathToFile))
+                    {
+                        File.AppendAllLines(MovieLog, new string[] { $"File {movie.FullPathToFile} already moved. skipping." });
+                        continue;
+                    }
+
+                    if (File.Exists(destinationFile))
+                    {
+                        File.AppendAllLines(MovieLog, new string[] { $"File {destinationFile} already exists. skipping." });
+                        continue;
+                    }
+                    
                     File.AppendAllLines(MovieLog, new string[] { $"Move {movie.FullPathToFile} to {destinationFile}" });
-                    File.Copy(movie.FullPathToFile, destinationFile, true);
+                    File.Move(movie.FullPathToFile, destinationFile, false);
                 }
 
                 MessageBox.Show($"{filesToMove.Count} file moved.");
+
+                foreach (var movie in movieFiles.Where(m => !m.Include))
+                {
+                    File.AppendAllLines(MovieLog, new string[] { $"File {movie.FullPathToFile} ignored" });
+                }
             }
         }
 
         private string GetValidName(string originalName)
         {
             var invalids = Path.GetInvalidFileNameChars();
-            var newName = String.Join("-", originalName.Split(invalids, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+            var newName = String.Join(" ", originalName.Split(invalids, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
             return newName;
         }
 
