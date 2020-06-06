@@ -1,0 +1,60 @@
+﻿<Window x:Class="MovieCleaner.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MovieCleaner"
+        mc:Ignorable="d"
+        Title="MovieCleaner" Height="800" Width="1200" Loaded="Window_Loaded">
+    <Window.Resources>
+        <DataTemplate x:Key="listBoxTemplate">
+            <StackPanel Margin="3" Orientation="Horizontal">
+                <TextBlock Width="300" Text="{Binding Title}" />
+                <TextBlock Width="300" Text="{Binding OriginalTitle}" />
+                <TextBlock Width="50" Text="{Binding OriginalLanguage}" />
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Source Path:" HorizontalAlignment="Center" Height="16"  Width="100" Margin="0,2,0,2"/>
+        <TextBlock Grid.Column="1" Text="TextBox" VerticalAlignment="Center" Name="tbSourcePath" Grid.ColumnSpan="2"/>
+
+        <TextBlock Grid.Row="1" Text="Destination Path:" HorizontalAlignment="Center" Height="16"  Width="100" Margin="0,2,0,2"/>
+        <TextBlock Grid.Column="1" Grid.Row="1" Text="TextBox" VerticalAlignment="Center"  Name="tbDestinationPath" Grid.ColumnSpan="2"/>
+
+        <TextBlock Grid.Row="2" Text="Movie Title:" HorizontalAlignment="Center" Height="16"  Width="100" Margin="0,2,0,2"/>
+        <CheckBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Name="cbInclude" IsChecked="true"/>
+        <TextBox Grid.Column="2" Grid.Row="2" Text="TextBox" VerticalAlignment="Center" Name="tbTitle"/>
+        <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.Row="2">
+            <Button Width="100" Name="btnPrev" Margin="2" Click="btnPrev_Click">Prev</Button>
+            <Button Width="100" Name="btnNext" Margin="2" Click="btnNext_Click">Next</Button>
+        </StackPanel>
+
+        <TextBlock Grid.Row="4" Text="Languages:" HorizontalAlignment="Center" Height="16"  Width="100" Margin="0,2,0,2"/>
+        <TextBlock Grid.Row="4" Grid.Column="1" Height="14" Name="tbLanguages" Grid.ColumnSpan="2" Margin="0,2,0,2"/>
+        <ListBox Grid.Row="4" Grid.Column="3" Grid.RowSpan="3" Name="tbTitles" Height="250" VerticalAlignment="Top" ItemTemplate="{StaticResource listBoxTemplate}" SelectionChanged="tbTitles_SelectionChanged"/>
+
+        <TextBlock Grid.Row="5" Text="Filename:" HorizontalAlignment="Center" Height="16"  Width="100" Margin="0,2,0,2"/>
+        <TextBlock Grid.Row="5" Grid.Column="1" Height="14" Name="tbFilename" Grid.ColumnSpan="2" Margin="0,2,0,2"/>
+
+        <TextBlock Grid.Row="6" Text="Folderinfo:" HorizontalAlignment="Center" VerticalAlignment="Top" Height="16"  Width="100" Margin="0,2,0,0"/>
+        <TextBlock Grid.Row="6" Grid.Column="1" Name="tbInfo" Height="200" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+
+    </Grid>
+</Window>
