@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Xml.Serialization;
 
 namespace MovieCleaner
 {
@@ -14,6 +15,9 @@ namespace MovieCleaner
     {
         private int currentFile;
         List<MovieFile> movieFiles;
+
+        private const string MovieXml = @"c:\temp\movies.xml";
+        private const string MovieLog = @"c:\temp\movies.txt";
 
         public MainWindow()
         {
@@ -26,11 +30,18 @@ namespace MovieCleaner
             tbDestinationPath.Text = @"\\Gibbs\Multimedia\Movies_Clean";
             tbTitle.Text = "";
 
-            movieFiles = new List<MovieFile>();
-            AppendFiles(tbSourcePath.Text, movieFiles);
+            if (File.Exists(MovieXml))
+            {
+                movieFiles = DeserializeMovies(MovieXml);
+            }
+            else
+            {
+                movieFiles = new List<MovieFile>();
+                AppendFiles(tbSourcePath.Text, movieFiles);
+            }
 
             currentFile = 0;
-            ShowMovie(currentFile);
+            ShowMovie();
         }
 
         private void AppendFiles(string sourceDirectory, List<MovieFile> movieFiles)
@@ -81,48 +92,89 @@ namespace MovieCleaner
 
         private void btnPrev_Click(object sender, RoutedEventArgs e)
         {
-            SaveCurrent(currentFile);
+            SaveCurrent();
             currentFile--;
-            ShowMovie(currentFile);
+            ShowMovie();
         }
 
         private void btnNext_Click(object sender, RoutedEventArgs e)
         {
-            SaveCurrent(currentFile);
+            SaveCurrent();
             currentFile++;
-            ShowMovie(currentFile); 
+            ShowMovie(); 
         }
 
-        private void SaveCurrent(int index)
+        private void SaveCurrent()
         {
-            if (index > -1)
+            if (currentFile > -1)
             {
-                movieFiles[index].SetTitle(tbTitle.Text);
-                movieFiles[index].DoInclude(cbInclude.IsChecked.Value);
+                movieFiles[currentFile].SetTitle(tbTitle.Text);
+                movieFiles[currentFile].DoInclude(cbInclude.IsChecked.Value);
+
+                SerializeMovies(MovieXml);
             }
         }
 
-        private void ShowMovie(int index)
+        private void ShowMovie()
         {
             btnPrev.IsEnabled = currentFile > 0;
             btnNext.IsEnabled = currentFile < movieFiles.Count - 1;
 
-            if (!string.IsNullOrEmpty(movieFiles[index].Title))
+            if (!string.IsNullOrEmpty(movieFiles[currentFile].Title))
             {
-                tbTitle.Text = movieFiles[index].Title;
+                tbTitle.Text = movieFiles[currentFile].Title;
             }
 
-            tbFilename.Text = movieFiles[index].Filename;
-            cbInclude.IsChecked = movieFiles[index].Include;
-            tbInfo.Text = $"{index + 1} / {movieFiles.Count}" + Environment.NewLine + movieFiles[index].GetInfo();
-            tbTitles.ItemsSource = movieFiles[index].MovieSearchResults;
-            tbLanguages.Text ="Audio Languages: " + string.Join(", ", movieFiles[index].AudioLanguages);
+            tbFilename.Text = movieFiles[currentFile].Filename;
+            cbInclude.IsChecked = movieFiles[currentFile].Include;
+            tbInfo.Text = $"{currentFile + 1} / {movieFiles.Count}" + Environment.NewLine + movieFiles[currentFile].GetInfo();
+            tbTitles.ItemsSource = movieFiles[currentFile].MovieSearchResults;
+            tbLanguages.Text ="Audio Languages: " + string.Join(", ", movieFiles[currentFile].AudioLanguages);
+        }
 
-            //if (cbInclude.IsChecked == true)
-            //{
-            //    var destinationFile = tbDestinationPath.Text + "\\" + tbTitle.Text + "\\" + tbTitle.Text + Path.GetExtension(movieFiles[currentFile].Filename);
-            //    File.AppendAllLines(@"c:\temp\movies.txt", new string[] { destinationFile });
-            //}
+        private void btnMove_Click(object sender, RoutedEventArgs e)
+        {
+            SaveCurrent();
+
+            if (MessageBox.Show("Move all files to target folder?", "Question", MessageBoxButton.YesNoCancel, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                var filesToMove = movieFiles.Where(m => m.Include).ToList();
+                File.WriteAllLines(MovieLog, new string[] { $"Move {filesToMove.Count} movie files" });
+
+                foreach (var movie in filesToMove)
+                {
+                    var name = GetValidName(movie.Title);
+                    var destinationFile = tbDestinationPath.Text + "\\" + name + Path.GetExtension(movie.Filename);
+                    File.AppendAllLines(MovieLog, new string[] { $"Move {movie.FullPathToFile} to {destinationFile}" });
+                    File.Copy(movie.FullPathToFile, destinationFile, true);
+                }
+
+                MessageBox.Show($"{filesToMove.Count} file moved.");
+            }
+        }
+
+        private string GetValidName(string originalName)
+        {
+            var invalids = Path.GetInvalidFileNameChars();
+            var newName = String.Join("-", originalName.Split(invalids, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+            return newName;
+        }
+
+        private void SerializeMovies(string filename)
+        {
+            var ser = new XmlSerializer(typeof(List<MovieFile>));
+            var writer = new StreamWriter(filename);
+            ser.Serialize(writer, movieFiles);
+            writer.Close();
+        }
+
+        private List<MovieFile> DeserializeMovies(string filename)
+        {
+            var ser = new XmlSerializer(typeof(List<MovieFile>));
+            using (Stream reader = new FileStream(filename, FileMode.Open))
+            {
+                return (List<MovieFile>)ser.Deserialize(reader);
+            }
         }
     }
 }

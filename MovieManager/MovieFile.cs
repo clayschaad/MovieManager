@@ -9,14 +9,15 @@ namespace MovieCleaner
 {
     public class MovieFile
     {
-        public string Filename { get; }
-        public string FullPath { get; }
-        public string FullPathToFile { get; }
-        public string Title { get; private set; }
-        public bool Include { get; private set; }
-        public List<string> AudioLanguages {get; private set; }
-        public List<string> SubtitleLanguages { get; private set; }
-        public List<MovieSearchResult> MovieSearchResults { get; private set; }
+        public string Filename { get; set; }
+        public string FullPath { get; set; }
+        public string FullPathToFile { get; set; }
+        public string Title { get; set; }
+        public bool Include { get; set; }
+        public List<string> AudioLanguages {get; set; }
+        public List<string> SubtitleLanguages { get; set; }
+        public List<MovieSearchResult> MovieSearchResults { get; set; }
+
 
         public static readonly string[] IgnoreFolders = new[] { "clipinf", "playlist", "bdmv", "sample", "certificate", "proof" };
 
@@ -38,7 +39,14 @@ namespace MovieCleaner
 
             var movieInfos = MovieDatabaseClient.SearchMovie(Title);
             MovieSearchResults = movieInfos.Results;
+
+            Include = true;
         }
+
+        // for serializer
+        public MovieFile()
+        {
+                    }
 
         public void SetTitle(string title)
         {

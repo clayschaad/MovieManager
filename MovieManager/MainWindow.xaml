@@ -30,7 +30,8 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="50" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="Source Path:" HorizontalAlignment="Center" Height="16"  Width="100" Margin="0,2,0,2"/>
         <TextBlock Grid.Column="1" Text="TextBox" VerticalAlignment="Center" Name="tbSourcePath" Grid.ColumnSpan="2"/>
@@ -47,14 +48,16 @@
         </StackPanel>
 
         <TextBlock Grid.Row="4" Text="Languages:" HorizontalAlignment="Center" Height="16"  Width="100" Margin="0,2,0,2"/>
-        <TextBlock Grid.Row="4" Grid.Column="1" Height="14" Name="tbLanguages" Grid.ColumnSpan="2" Margin="0,2,0,2"/>
-        <ListBox Grid.Row="4" Grid.Column="3" Grid.RowSpan="3" Name="tbTitles" Height="250" VerticalAlignment="Top" ItemTemplate="{StaticResource listBoxTemplate}" SelectionChanged="tbTitles_SelectionChanged"/>
+        <TextBlock Grid.Row="4" Grid.Column="1" Height="16" Name="tbLanguages" Grid.ColumnSpan="2" Margin="0,2,0,2"/>
+        <ListBox Grid.Row="4" Grid.Column="3" Grid.RowSpan="3" Name="tbTitles" Height="Auto" VerticalAlignment="Top" ItemTemplate="{StaticResource listBoxTemplate}" SelectionChanged="tbTitles_SelectionChanged"/>
 
         <TextBlock Grid.Row="5" Text="Filename:" HorizontalAlignment="Center" Height="16"  Width="100" Margin="0,2,0,2"/>
-        <TextBlock Grid.Row="5" Grid.Column="1" Height="14" Name="tbFilename" Grid.ColumnSpan="2" Margin="0,2,0,2"/>
+        <TextBlock Grid.Row="5" Grid.Column="1" Height="16" Name="tbFilename" Grid.ColumnSpan="2" Margin="0,2,0,2"/>
 
         <TextBlock Grid.Row="6" Text="Folderinfo:" HorizontalAlignment="Center" VerticalAlignment="Top" Height="16"  Width="100" Margin="0,2,0,0"/>
-        <TextBlock Grid.Row="6" Grid.Column="1" Name="tbInfo" Height="200" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+        <TextBlock Grid.Row="6" Grid.Column="1" Name="tbInfo" Height="Auto" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+
+        <Button Grid.Row="7" Grid.Column="3" Name="btnMove" Content="Move" Click="btnMove_Click" />
 
     </Grid>
 </Window>
